@@ -3,27 +3,27 @@ import random
 
 level1 = """
 ##################################################
-#..$$.>..s...BBa.b.G.p.E.b.$$$.$K..r.$.h..c...D..#
-#................................................#
-#...........:....######D####.........:...........#
-#................#..$$$$$$.#.....................#
+#..$$.>..s...BBa.b.G.p.E.b.$$$.$K..r.$.h..c..#D..#
+#...........................................##...#
+#...........:....######D####.........:.......#...#
+#................#..$$$$$$.#.................#...#
 ##################################################"""
 
 level2 = """
 ##################################################
-#.....<...................#.........a....s.......#
-#........$$$$$$$$$........#......................#
-#.......................:.#.:....................#
-#>...............B........#.......B...KKK........#
+#.....<...................#.........a....s..#....#
+#........$$$$$$$$$........#................#.#...#
+#.......................:.#.:................#...#
+#>...............B........#.......B...KKK..##....#
 ##################################################
 """
 
 level3 = """
 ##################################################
-#.....###......####.......#.........a....s.......#
-#.....#..$$$$$$$$$#...............B..............#
-#.....###......####.....:.#.:.....B..............#
-#<........................#.......B..............#
+#.....###......####.......#.........a....s.###...#
+#.....#..$$$$$$$$$#...............B.........##...#
+#.....###......####.....:.#.:.....B..........#...#
+#<........................#.......B........###...#
 ##################################################
 """
 
@@ -136,7 +136,6 @@ def fight(angreifer, verteidiger):
 def teleport(x, y, distance=5):
     versuch = 0
     while versuch < 1000000:
-        a
         dx = random.randint(-distance, distance)
         dy = random.randint(-distance, distance)
         if (dx**2 + dy**2)**0.5 > distance:
@@ -294,7 +293,9 @@ while hero.hp > 0 and hero.hunger < 1000:
         for monster in Monster.zoo.values():
             if monster.number == hero.number:
                 continue
-            if monster.x == hero.x + dx and monster.y == hero.y:
+            elif monster.z != hero.z:
+                continue
+            elif monster.x == hero.x + dx and monster.y == hero.y + dy:
                 if dx > 1 or dx < -1 or dy > 1 or dy < -1:
                     print("you can not jump into a monster")
                     dx = 0
@@ -347,6 +348,8 @@ while hero.hp > 0 and hero.hunger < 1000:
     for monster in Monster.zoo.values():
         if monster.number == hero.number:
             continue 
+        if monster.z != hero.z:
+            continue
         dx, dy = monster.move()
         if dx == 0 and dy == 0:
             continue
@@ -359,9 +362,14 @@ while hero.hp > 0 and hero.hunger < 1000:
         for monster2 in Monster.zoo.values():
             if monster2.number == monster.number:
                 continue
+            if monster2.z != hero.z:
+                continue
             if monster.x + dx == monster2.x and monster.y+dy == monster2.y:
                 dx = 0
                 dy = 0
+                if monster2.number == hero.number:
+                    print("Angriff von wanderndem Monster")
+                    fight(monster, hero)
                 break
         monster.x += dx
         monster.y += dy
