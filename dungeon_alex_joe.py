@@ -6,7 +6,7 @@ level1 = """
 #..$$.>..s...BBa.b.G.p.E.b.$$$.$K..r.$.h..c..#D..#
 #...........................................##...#
 #...........:....######D####.........:.......#...#
-#................#..$$$$$$.#.................#...#
+#...????.........#..$$$$$$.#.................#...#
 ##################################################"""
 
 level2 = """
@@ -314,6 +314,29 @@ while hero.hp > 0 and hero.hunger < 1000:
         
     # ----------Auswertung----------
     stuff = level[hero.y][hero.x]
+    # ------ Rätselkiste ---- 
+    if stuff == "?":
+        print("you discovered a question box")
+        skill = input("how hard?(1-9) 1=very easy, 9=very hard")
+        if skill not in "123456789" or len(skill) != 1:
+            print("stupid answer ---> very hard question!")
+            skill = 11
+        else:
+            skill = int(skill)
+        a = random.randint(1,skill)
+        b = random.randint(1, skill)
+        c = a * b
+        answer = input("what is {} x {}?".format(a,b))
+        try:
+            answer = int(answer)
+        except:
+            answer = -1
+        if answer == c:
+            print("Bravo, correct!")
+        else:
+            print("Very bad. Very, very bad!")
+        
+        
     # ------ teleport --------
     if stuff == ":":
         hero.x, hero.y = teleport(hero.x, hero.y)
