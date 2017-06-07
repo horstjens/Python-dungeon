@@ -3,17 +3,30 @@ import random
 
 level1 = """
 ##################################################
-#..$$....s...BBa.b.G.p.E.b.$$$.$K..r.$.h..c...D..#
+#..$$.>..s...BBa.b.G.p.E.b.$$$.$K..r.$.h..c...D..#
 #................................................#
 #...........:....######D####.........:...........#
 #................#..$$$$$$.#.....................#
 ##################################################"""
 
-level = []
-for line in level1.split():
-    level.append(list(line))
-    #print(line)
-    #input()
+level2 = """
+##################################################
+#.....<...................#.........a....s.......#
+#........$$$$$$$$$........#......................#
+#.......................:.#.:....................#
+#>...............B........#.......B...KKK........#
+##################################################
+"""
+
+level3 = """
+##################################################
+#.....###......####.......#.........a....s.......#
+#.....#..$$$$$$$$$#...............B..............#
+#.....###......####.....:.#.:.....B..............#
+#<........................#.......B..............#
+##################################################
+"""
+
 
 
 
@@ -32,11 +45,12 @@ class Monster():
     number = 0
     zoo = {}
     
-    def __init__(self, x=0, y=1, hp=10, name = "monster",
+    def __init__(self, x=0, y=1, z=0, hp=10, name = "monster",
                  tohit = 0.5, evade = 0.25, maxdamage = 3, char="?"):
         self.hp = hp
         self.x = x
         self.y = y
+        self.z = z
         self.name = name
         self.tohit = tohit
         self.evade = evade
@@ -53,35 +67,35 @@ class Monster():
         return 0, 0
  
 class Bunny(Monster):
-    def __init__(self, posx, posy):
-        Monster.__init__(self, posx, posy, 2, "Bunny", 0.6, 0.8, 1, "B")
+    def __init__(self, posx, posy, posz):
+        Monster.__init__(self, posx, posy, posz, 2, "Bunny", 0.6, 0.8, 1, "B")
     
 class Dog(Monster):
-    def __init__(self, posx, posy):
-        Monster.__init__(self, posx, posy, 10, "Dog", 0.4, 0.35, 3, "G")
+    def __init__(self, posx, posy, posz):
+        Monster.__init__(self, posx, posy, posz, 10, "Dog", 0.4, 0.35, 3, "G")
                 
 class Dragon(Monster):
-    def __init__(self,posx, posy):
-        Monster.__init__(self, posx, posy, 30, "Dragon", 0.25, 0.1, 22, "D")
+    def __init__(self,posx, posy, posz):
+        Monster.__init__(self, posx, posy, posz, 30, "Dragon", 0.25, 0.1, 22, "D")
          
     def move(self):
         return random.choice((-1,0,1)), random.choice((-1,0,1)) # the dragon moves or waits
         
 class Duck(Monster):
-    def __init__(self,posx, posy):
-        Monster.__init__(self,posx, posy, 5, "Evil Duck", 0.47, 0.23, 2, "E")
+    def __init__(self,posx, posy, posz):
+        Monster.__init__(self,posx, posy, posz, 5, "Evil Duck", 0.47, 0.23, 2, "E")
         
 class Kobold(Monster):
-    def __init__(self,posx, posy):
-        Monster.__init__(self,posx, posy, 3, "Kobold", 0.8, 0.01, 1, "K")
+    def __init__(self,posx, posy, posz):
+        Monster.__init__(self,posx, posy, posz, 3, "Kobold", 0.8, 0.01, 1, "K")
     
     def move(self):
         return random.choice((-1,0,0,0,1)), random.choice((-1,0,0,0,1)) # kobold jumps, sometimes
         
 
 class Hero(Monster):
-    def __init__(self,posx, posy):
-        Monster.__init__(self,posx, posy,  10, "Hero", 0.7, 0.3, 7, "@")
+    def __init__(self,posx, posy, posz):
+        Monster.__init__(self,posx, posy, posz, 10, "Hero", 0.7, 0.3, 7, "@")
         self.hunger = 0
         self.money = 0
 
@@ -201,38 +215,49 @@ def shop(customer):
                                         
                                                 
 
-# generiere monster
-hero = Hero(1,1)
+# ------ generiere monster -------
+hero = Hero(1,1,0)
 
-for y, line in enumerate(level):
-    for x, char in enumerate(line):
-        if char in "GDEKB":
-            level[y][x] = "."
-            if char == "G":
-                Dog(x,y)
-            elif char == "D":
-                Dragon(x,y)
-            elif char == "E":
-                Duck(x,y)
-            elif char == "K":
-                Kobold(x,y)
-            elif char == "B":
-                Bunny(x,y)
+levels = []
+for z, levelstring in enumerate((level1, level2, level3)):
+    
+    level = []
+    for line in levelstring.split():
+        level.append(list(line))
+        
+
+    for y, line in enumerate(level):
+        for x, char in enumerate(line):
+            if char in "GDEKB":
+                level[y][x] = "."
+                if char == "G":
+                    Dog(x,y,z)
+                elif char == "D":
+                    Dragon(x,y,z)
+                elif char == "E":
+                    Duck(x,y,z)
+                elif char == "K":
+                    Kobold(x,y,z)
+                elif char == "B":
+                    Bunny(x,y,z)
+    
+    levels.append(level)
 
 # ------------ main loop -------------
 while hero.hp > 0 and hero.hunger < 1000:
+    level = levels[hero.z]
     for y, line in enumerate(level):
          for x, char in enumerate(line):
             for number in Monster.zoo:
                 monster = Monster.zoo[number]
-                if monster.x == x and monster.y == y:
+                if monster.x == x and monster.y == y and monster.z == hero.z:
                     print(monster.char, end="")
                     break
             else:
                 print(char, end = "")
          print() # end of line
     hero.hunger += 1
-    print("pos:", hero.x, hero.y)
+    print("pos:", hero.x, hero.y, hero.z)
     command=input("Hunger: {} Money: {} HP: {},your command?".format(hero.hunger, hero.money, hero.hp))
     dx = 0
     dy = 0
@@ -291,6 +316,19 @@ while hero.hp > 0 and hero.hunger < 1000:
     # ------ teleport --------
     if stuff == ":":
         hero.x, hero.y = teleport(hero.x, hero.y)
+    # ------ stair down --------
+    if stuff == ">":
+        climb = input("do you want to climb down? (yes or no)")
+        if climb == "yes":
+            hero.z += 1
+            continue
+    # ------ stair up --------
+    if stuff == "<":
+        climb = input("do you want to climb up ? (yes or no)")
+        if climb == "yes":
+            hero.z -= 1
+            continue
+        
     # ------ food and money ------
     if stuff in food:
         print("You eat : ", food[stuff][0])
